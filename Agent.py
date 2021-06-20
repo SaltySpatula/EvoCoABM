@@ -11,11 +11,7 @@ class Agent:
         self.start_state = start_state
         self.state = start_state
         self.received_token = None
-
-        initial_action = self.state_actions[self.state]
-        self.send_token = initial_action if initial_action in self.communication_tokens else 0
-        print(self.send_token)
-
+        self.send_token = None
         self.final_move = None
         self.computational_capacity = len(self.transition_matrix)
 

@@ -5,17 +5,19 @@ from Agent import Agent
 
 class Model:
     def __init__(self, agents, agent_computation_capacity, communication_tokens,
-                 iterations, learning_method, timeout):
+                 generations, learning_method, timeout):
         self.number_of_agents = agents
         self.agent_computation_capacity = agent_computation_capacity
         self.number_of_communication_tokens = communication_tokens
-        self.iterations = iterations
+        self.generations = generations
         self.time = 0
         self.learning_method = learning_method
         self.timeout = timeout
         self.allowed_communication_tokens = np.array([i for i in range(self.number_of_communication_tokens + 1)])
         self.moves = ['C', 'D']
         self.agents = [0 for i in range(self.number_of_agents)]
+
+        self.game_history = [[] for i in range(generations)]
 
     def genetic_algorithm_setup(self):
         if self.time == 0:
@@ -53,14 +55,15 @@ class Model:
 
     def run_model(self):
         print("Running model...")
-        while self.time != self.iterations:
-            print("Starting Iteration: " + str(self.time))
+        while self.time != self.generations:
+            print("Starting Generation: " + str(self.time))
             if self.learning_method == 'GA':
                 self.genetic_algorithm_setup()
             for agent_index in range(self.number_of_agents):
                 for agent_jdex in range(agent_index + 1, self.number_of_agents):
                     one_shot_pd = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout)
                     one_shot_pd.play()
+                    self.game_history[self.time].append(one_shot_pd)
             self.time = self.time + 1
         print("Done")
 
@@ -106,7 +109,7 @@ class Model:
 class Game:
     def __init__(self, row_agent, column_agent, timeout):
         self.over = 0
-        self.tokens_exchanged = np.array([[], []])
+        self.tokens_exchanged = []
         self.row_agent = row_agent
         self.column_agent = column_agent
         self.timeout = timeout
@@ -146,5 +149,6 @@ class Game:
         self.row_agent.payoff += row_agent_payoff
 
     def exchange_tokens(self):
+        self.tokens_exchanged.append([self.row_agent.send_token, self.column_agent.send_token])
         self.column_agent.received_token = self.row_agent.send_token
         self.row_agent.received_token = self.column_agent.send_token
