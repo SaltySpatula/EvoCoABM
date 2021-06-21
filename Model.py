@@ -39,6 +39,8 @@ class Model:
                 average_payoff_agent_2 = agent_2.payoff / no_games_played
                 # better agent chosen for reproduction
                 better_agent = agent_1 if average_payoff_agent_1 >= average_payoff_agent_2 else agent_2
+                # payoff is reset after each generation
+                better_agent.payoff = 0
                 better_agent = copy.deepcopy(better_agent)
 
                 mutation_coefficient = random.uniform(0, 1)
@@ -66,7 +68,7 @@ class Model:
                 for agent_jdex in range(agent_index + 1, self.number_of_agents):
                     one_shot_pd = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout)
                     one_shot_pd.play()
-                    self.game_history[self.time].append(one_shot_pd)
+                    self.game_history[self.time].append(copy.deepcopy(one_shot_pd))
             self.time = self.time + 1
         print("Done")
 

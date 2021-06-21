@@ -14,10 +14,14 @@ class Agent:
         self.final_move = None
         self.computational_capacity = len(self.transition_matrix)
 
-        self.type = None
-        if self.state_actions[self.state] == 'D':
-            self.type = 'NCD'
-        #if self.is_crc():
+        #if self.is_ncd():
+            #self.type = 'NCD'
+        #elif self.is_crc():
+            #self.type = 'CRC'
+        #elif self.is_mimic():
+            #self.type = 'CD'
+        #else:
+            #self.type = None
 
     def step(self):
         if self.final_move is None:
@@ -41,3 +45,5 @@ class Agent:
     #def is_mimic(self):
 
 
+    #def is_ncd(self):
+    #   return self.state_actions[self.start_state] == 'D'
