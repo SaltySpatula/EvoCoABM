@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-
 class Agent:
     def __init__(self, state_actions, transition_matrix, communication_tokens, start_state):
         self.payoff = 0
@@ -15,9 +14,13 @@ class Agent:
         self.final_move = None
         self.computational_capacity = len(self.transition_matrix)
 
+        self.type = None
+        if self.state_actions[self.state] == 'D':
+            self.type = 'NCD'
+        #if self.is_crc():
+
     def step(self):
         if self.final_move is None:
-            self.state = self.transition_matrix[self.state][self.received_token]
             action = self.state_actions[self.state]
             if action in self.communication_tokens:
                 self.send_token = action
@@ -28,6 +31,13 @@ class Agent:
     def reset(self):
         self.state = self.start_state
         self.received_token = None
-        initial_action = self.state_actions[self.state]
-        self.send_token = initial_action if initial_action in self.communication_tokens else 0
+        self.send_token = None
         self.final_move = None
+
+    #def is_crc(self):
+
+
+
+    #def is_mimic(self):
+
+

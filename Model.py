@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import copy
 from Agent import Agent
 
 
@@ -38,6 +39,7 @@ class Model:
                 average_payoff_agent_2 = agent_2.payoff / no_games_played
                 # better agent chosen for reproduction
                 better_agent = agent_1 if average_payoff_agent_1 >= average_payoff_agent_2 else agent_2
+                better_agent = copy.deepcopy(better_agent)
 
                 mutation_coefficient = random.uniform(0, 1)
                 if mutation_coefficient >= 0.5:
@@ -56,7 +58,8 @@ class Model:
     def run_model(self):
         print("Running model...")
         while self.time != self.generations:
-            print("Starting Generation: " + str(self.time))
+            if not self.time % 100:
+                print("Starting Generation: " + str(self.time))
             if self.learning_method == 'GA':
                 self.genetic_algorithm_setup()
             for agent_index in range(self.number_of_agents):
@@ -114,39 +117,41 @@ class Game:
         self.column_agent = column_agent
         self.timeout = timeout
         self.payoff_matrix = {
-            'CC': [2, 2],
-            'CD': [4, 1],
-            'DD': [3, 3],
-            'DC': [1, 4],
-            'COL_UNDECIDED': [4, 0],
-            'ROW_UNDECIDED': [0, 4],
-            'BOTH_UNDECIDED': [0, 0]
+            'CC': [3, 3],
+            'CD': [0, 4],
+            'DD': [1, 1],
+            'DC': [4, 0],
+            'COL_UNDECIDED': [2, -5],
+            'ROW_UNDECIDED': [-5, 2],
+            'BOTH_UNDECIDED': [-5, -5]
         }
         self.game_outcome = None
+        self.column_agent_payoff = 0
+        self.row_agent_payoff = 0
+        self.playtime = 0
 
     def play(self):
         self.column_agent.reset()
         self.row_agent.reset()
-        playtime = 0
-        while playtime != self.timeout:
-            self.exchange_tokens()
+        while self.playtime != self.timeout:
             self.row_agent.step()
             self.column_agent.step()
-            playtime = playtime + 1
+            self.exchange_tokens()
             if self.column_agent.final_move is not None and self.row_agent.final_move is not None:
                 self.game_outcome = self.row_agent.final_move + self.column_agent.final_move
                 break
-            if self.column_agent.final_move is None and self.row_agent.final_move is None:
-                self.game_outcome = 'BOTH_UNDECIDED'
-            elif self.column_agent.final_move is None:
-                self.game_outcome = 'COL_UNDECIDED'
-            else:
-                self.game_outcome = 'ROW_UNDECIDED'
+            self.playtime = self.playtime + 1
 
-        row_agent_payoff = self.payoff_matrix.get(self.game_outcome)[0]
-        column_agent_payoff = self.payoff_matrix.get(self.game_outcome)[1]
-        self.column_agent.payoff += column_agent_payoff
-        self.row_agent.payoff += row_agent_payoff
+        if self.column_agent.final_move is None and self.row_agent.final_move is None:
+            self.game_outcome = 'BOTH_UNDECIDED'
+        elif self.column_agent.final_move is None:
+            self.game_outcome = 'COL_UNDECIDED'
+        elif self.row_agent.final_move is None:
+            self.game_outcome = 'ROW_UNDECIDED'
+        self.row_agent_payoff = self.payoff_matrix.get(self.game_outcome)[0]
+        self.column_agent_payoff = self.payoff_matrix.get(self.game_outcome)[1]
+        self.column_agent.payoff += self.column_agent_payoff
+        self.row_agent.payoff += self.row_agent_payoff
 
     def exchange_tokens(self):
         self.tokens_exchanged.append([self.row_agent.send_token, self.column_agent.send_token])
