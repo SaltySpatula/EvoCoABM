@@ -78,15 +78,53 @@ class GameHistoryAnalysis:
         plt.xlabel('Generation')
         plt.show()
 
-    def plot_NCD_agents(self):
+    def plot_NCD_agents(self, number_of_agents):
         ncd_agents_by_generation = []
         for generation in self.game_history:
             ncd_agent = 0
-            for game in generation:
-                if all( game.tokens_exchanged[i][0]==0 for i in range(len(game.tokens_exchanged))):
+            first_iter = True
+            for game in generation[:number_of_agents]:
+                if game.row_agent.type == 'NCD' and first_iter:
                     ncd_agent += 1
-                if all( game.tokens_exchanged[i][1]==0 for i in range(len(game.tokens_exchanged))):
+                    first_iter = False
+                if game.column_agent.type == 'NCD':
                     ncd_agent += 1
+            ncd_agents_by_generation.append(ncd_agent)
+        plt.plot(ncd_agents_by_generation)
+        plt.ylabel('NCD Agents')
+        plt.xlabel('Generation')
+        plt.show()
 
+    def plot_CRC_agents(self, number_of_agents):
+        crc_agents_by_generation = []
+        for generation in self.game_history:
+            crc_agent = 0
+            first_iter = True
+            for game in generation[:number_of_agents]:
+                if game.row_agent.type == 'CRC' and first_iter:
+                    crc_agent += 1
+                    first_iter = False
+                if game.column_agent.type == 'CRC':
+                    crc_agent += 1
+            crc_agents_by_generation.append(crc_agent)
+        plt.plot(crc_agents_by_generation)
+        plt.ylabel('CRC Agents')
+        plt.xlabel('Generation')
+        plt.show()
 
-
+    def plot_CD_agents(self, number_of_agents):
+        cd_agents_by_generation = []
+        for generation in self.game_history:
+            cd_agent = 0
+            first_iter = True
+            for game in generation[:number_of_agents]:
+                if game.row_agent.type == 'CD' and first_iter:
+                    cd_agent += 1
+                    first_iter = False
+                if game.column_agent.type == 'CD':
+                    cd_agent += 1
+            cd_agents_by_generation.append(cd_agent)
+        plt.plot(cd_agents_by_generation)
+        plt.ylabel('Mimics')
+        plt.xlabel('Generation')
+        plt.show()

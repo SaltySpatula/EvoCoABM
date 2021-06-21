@@ -73,21 +73,22 @@ class Model:
         print("Done")
 
     def create_random_agent(self):
-        transition_matrix = self.create_random_transition_matrix()
-        state_actions = self.create_random_state_actions()
-        start_state = random.choice([i for i in range(self.agent_computation_capacity)])
+        number_of_states = random.choice([i for i in range(1, self.agent_computation_capacity+1)])
+        transition_matrix = self.create_random_transition_matrix(number_of_states)
+        state_actions = self.create_random_state_actions(number_of_states)
+        start_state = random.choice([i for i in range(number_of_states)])
         return Agent(state_actions, transition_matrix, self.allowed_communication_tokens, start_state)
 
-    def create_random_transition_matrix(self):
-        possible_states = [i for i in range(self.agent_computation_capacity)]
-        transition_matrix = np.ndarray((self.agent_computation_capacity, self.number_of_communication_tokens + 1), dtype=int)
-        for state_index in range(self.agent_computation_capacity):
+    def create_random_transition_matrix(self, number_of_states):
+        possible_states = [i for i in range(number_of_states)]
+        transition_matrix = np.ndarray((number_of_states, self.number_of_communication_tokens + 1), dtype=int)
+        for state_index in range(number_of_states):
             for received_token_index in range(len(transition_matrix[state_index])):
                 transition_matrix[state_index][received_token_index] = random.choice(possible_states)
         return transition_matrix
 
-    def create_random_state_actions(self):
-        return [self.get_random_action() for i in range(self.agent_computation_capacity)]
+    def create_random_state_actions(self, number_of_states):
+        return [self.get_random_action() for i in range(number_of_states)]
 
     def get_random_action(self):
         move_or_communicate = random.uniform(0, 1)
