@@ -1,12 +1,12 @@
 import numpy as np
 import random
 import copy
-from Agent import Agent
+from GeneticAgent import GeneticAgent
 
 
 class Model:
     def __init__(self, agents, agent_computation_capacity, communication_tokens,
-                 generations, learning_method, timeout):
+                 generations, learning_method, timeout, game_type):
         self.number_of_agents = agents
         self.agent_computation_capacity = agent_computation_capacity
         self.number_of_communication_tokens = communication_tokens
@@ -15,7 +15,11 @@ class Model:
         self.learning_method = learning_method
         self.timeout = timeout
         self.allowed_communication_tokens = np.array([i for i in range(self.number_of_communication_tokens + 1)])
-        self.moves = ['C', 'D']
+        self.game_type = game_type
+        if game_type == 'PD':
+            self.moves = ['C', 'D']
+        if game_type == 'SH':
+            self.moves = ['S', 'H']
         self.agents = [0 for i in range(self.number_of_agents)]
 
         self.game_history = [[] for i in range(generations)]
@@ -67,9 +71,9 @@ class Model:
                 self.genetic_algorithm_setup()
             for agent_index in range(self.number_of_agents):
                 for agent_jdex in range(agent_index + 1, self.number_of_agents):
-                    one_shot_pd = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout)
-                    one_shot_pd.play()
-                    self.game_history[self.time].append(copy.deepcopy(one_shot_pd))
+                    one_shot_game = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout, self.game_type)
+                    one_shot_game.play()
+                    self.game_history[self.time].append(copy.deepcopy(one_shot_game))
             self.time = self.time + 1
         print("Done")
 
@@ -78,7 +82,7 @@ class Model:
         transition_matrix = self.create_random_transition_matrix(number_of_states)
         state_actions = self.create_random_state_actions(number_of_states)
         start_state = random.choice([i for i in range(number_of_states)])
-        return Agent(state_actions, transition_matrix, self.allowed_communication_tokens, start_state)
+        return GeneticAgent(state_actions, transition_matrix, self.allowed_communication_tokens, start_state)
 
     def create_random_transition_matrix(self, number_of_states):
         possible_states = [i for i in range(number_of_states)]
@@ -114,21 +118,32 @@ class Model:
 
 
 class Game:
-    def __init__(self, row_agent, column_agent, timeout):
+    def __init__(self, row_agent, column_agent, timeout, type):
         self.over = 0
         self.tokens_exchanged = []
         self.row_agent = row_agent
         self.column_agent = column_agent
         self.timeout = timeout
-        self.payoff_matrix = {
-            'CC': [3, 3],
-            'CD': [0, 4],
-            'DD': [1, 1],
-            'DC': [4, 0],
-            'COL_UNDECIDED': [2, -5],
-            'ROW_UNDECIDED': [-5, 2],
-            'BOTH_UNDECIDED': [-5, -5]
-        }
+        if type == 'PD':
+            self.payoff_matrix = {
+                'CC': [3, 3],
+                'CD': [0, 4],
+                'DD': [1, 1],
+                'DC': [4, 0],
+                'COL_UNDECIDED': [2, -5],
+                'ROW_UNDECIDED': [-5, 2],
+                'BOTH_UNDECIDED': [-5, -5]
+            }
+        if type == 'SH':
+            self.payoff_matrix = {
+                'SS': [20, 20],
+                'SH': [10, 18.5],
+                'HS': [18.5, 10],
+                'HH': [12, 12],
+                'COL_UNDECIDED': [12, 0],
+                'ROW_UNDECIDED': [0, 12],
+                'BOTH_UNDECIDED': [0, 0]
+            }
         self.game_outcome = None
         self.column_agent_payoff = 0
         self.row_agent_payoff = 0

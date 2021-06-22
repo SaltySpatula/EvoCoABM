@@ -41,7 +41,7 @@ class GameHistoryAnalysis:
             cooperative_games = 0
             game_index = 0
             for game in generation:
-                if game.game_outcome == 'CC':
+                if game.game_outcome == 'CC' or game.game_outcome == 'SS':
                     cooperative_games = cooperative_games + 1
                 game_index = game_index + 1
             cooperative_play_percentages.append((cooperative_games/game_index) * 100)
