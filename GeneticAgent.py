@@ -1,7 +1,3 @@
-import numpy as np
-import random
-
-
 class GeneticAgent:
     def __init__(self, state_actions, transition_matrix, communication_tokens, start_state):
         self.payoff = 0

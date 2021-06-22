@@ -2,6 +2,7 @@ import numpy as np
 import random
 import copy
 from GeneticAgent import GeneticAgent
+from ReinforcementAgent import ReinforcementAgent
 
 
 class Model:
@@ -14,7 +15,7 @@ class Model:
         self.time = 0
         self.learning_method = learning_method
         self.timeout = timeout
-        self.allowed_communication_tokens = np.array([i for i in range(self.number_of_communication_tokens + 1)])
+        self.allowed_communication_tokens = [i for i in range(self.number_of_communication_tokens + 1)]
         self.game_type = game_type
         if game_type == 'PD':
             self.moves = ['C', 'D']
@@ -23,6 +24,10 @@ class Model:
         self.agents = [0 for i in range(self.number_of_agents)]
 
         self.game_history = [[] for i in range(generations)]
+
+    def reinforcement_learning_setup(self):
+        for i in range(self.number_of_agents):
+            self.agents[i] = ReinforcementAgent(self.moves, self.allowed_communication_tokens)
 
     def genetic_algorithm_setup(self):
         if self.time == 0:
@@ -58,10 +63,6 @@ class Model:
             # swap populations
             self.agents = new_population
 
-#    def RL_setup(self):
-#       #ToDo:
-#       if self.time == 0:
-
     def run_model(self):
         print("Running model...")
         while self.time != self.generations:
@@ -69,11 +70,17 @@ class Model:
                 print("Starting Generation: " + str(self.time))
             if self.learning_method == 'GA':
                 self.genetic_algorithm_setup()
+            if self.learning_method == 'RL':
+                self.reinforcement_learning_setup()
             for agent_index in range(self.number_of_agents):
                 for agent_jdex in range(agent_index + 1, self.number_of_agents):
                     one_shot_game = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout, self.game_type)
                     one_shot_game.play()
+                    if self.learning_method == 'RL':
+                        self.agents[agent_index].final_payoff(one_shot_game.row_agent_payoff)
+                        self.agents[agent_jdex].final_payoff(one_shot_game.column_agent_payoff)
                     self.game_history[self.time].append(copy.deepcopy(one_shot_game))
+
             self.time = self.time + 1
         print("Done")
 
@@ -82,7 +89,7 @@ class Model:
         transition_matrix = self.create_random_transition_matrix(number_of_states)
         state_actions = self.create_random_state_actions(number_of_states)
         start_state = random.choice([i for i in range(number_of_states)])
-        return GeneticAgent(state_actions, transition_matrix, self.allowed_communication_tokens, start_state)
+        return GeneticAgent(state_actions, transition_matrix, self.allowed_communication_tokens[1:], start_state)
 
     def create_random_transition_matrix(self, number_of_states):
         possible_states = [i for i in range(number_of_states)]
