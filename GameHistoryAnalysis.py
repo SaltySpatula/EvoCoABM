@@ -56,8 +56,10 @@ class GameHistoryAnalysis:
             generation_total_tokens_exchanged = 0
             games_in_generation = 0
             for game in generation:
-                generation_total_tokens_exchanged += len(game.tokens_exchanged)
-                games_in_generation += 1
+                tokens_exchanged = len(game.tokens_exchanged)
+                generation_total_tokens_exchanged += tokens_exchanged if tokens_exchanged != 100 else 0
+                if tokens_exchanged != 100:
+                    games_in_generation += 1
             average_chat_length.append(generation_total_tokens_exchanged/games_in_generation)
 
         plt.plot(average_chat_length)
@@ -70,7 +72,7 @@ class GameHistoryAnalysis:
         for generation in self.game_history:
             distinct_conversations = []
             for game in generation:
-                if game.tokens_exchanged not in distinct_conversations:
+                if game.tokens_exchanged not in distinct_conversations and len(game.tokens_exchanged) != 100:
                     distinct_conversations.append(game.tokens_exchanged)
             unique_conversations_by_gen.append(len(distinct_conversations))
         plt.plot(unique_conversations_by_gen)
