@@ -47,6 +47,7 @@ class Model:
                 if mutation_coefficient >= 0.5:
                     # mutate
                     self.mutate(better_agent)
+                    better_agent.update_type()
 
                 new_population[new_population_index] = better_agent
                 new_population_index = new_population_index + 1
@@ -137,9 +138,9 @@ class Game:
         self.column_agent.reset()
         self.row_agent.reset()
         while self.playtime != self.timeout:
+            self.exchange_tokens()
             self.row_agent.step()
             self.column_agent.step()
-            self.exchange_tokens()
             if self.column_agent.final_move is not None and self.row_agent.final_move is not None:
                 self.game_outcome = self.row_agent.final_move + self.column_agent.final_move
                 break
