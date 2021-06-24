@@ -27,7 +27,7 @@ class Model:
 
     def reinforcement_learning_setup(self):
         for i in range(self.number_of_agents):
-            self.agents[i] = ReinforcementAgent(self.moves, self.allowed_communication_tokens)
+            self.agents[i] = ReinforcementAgent(self.moves, self.allowed_communication_tokens[1:])
 
     def genetic_algorithm_setup(self):
         if self.time == 0:

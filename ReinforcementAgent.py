@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import copy
 
 learning_rate = 0.1
 discount_factor = 1
@@ -28,12 +29,11 @@ class ReinforcementAgent:
             self.send_token = 0
 
     def step(self):
-        if self.received_token is not None:
-            self.tokens_received.append(self.received_token)
-
         if self.final_move is None:
-            if self.tokens_received not in self.past_states:
-                self.past_states.append(self.tokens_received)
+            if self.received_token is not None:
+                self.tokens_received.append(int(self.received_token))
+            if not any(sub_list == self.tokens_received for sub_list in self.past_states):
+                self.past_states.append(copy.deepcopy(self.tokens_received))
                 self.q_table.append([0 for i in self.actions])
 
             next_state_index = self.past_states.index(self.tokens_received)
