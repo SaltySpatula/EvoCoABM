@@ -27,7 +27,7 @@ class Model:
 
     def reinforcement_learning_setup(self):
         for i in range(self.number_of_agents):
-            self.agents[i] = ReinforcementAgent(self.moves, self.allowed_communication_tokens[1:])
+            self.agents[i] = ReinforcementAgent(self.moves, self.allowed_communication_tokens[1:], self.agent_computation_capacity)
 
     def genetic_algorithm_setup(self):
         if self.time == 0:
@@ -56,7 +56,6 @@ class Model:
                 if mutation_coefficient >= 0.5:
                     # mutate
                     self.mutate(better_agent)
-                    better_agent.update_type()
 
                 new_population[new_population_index] = better_agent
                 new_population_index = new_population_index + 1
@@ -65,20 +64,23 @@ class Model:
 
     def run_model(self):
         print("Running model...")
+        if self.learning_method == 'RL':
+            self.reinforcement_learning_setup()
         while self.time != self.generations:
             if not self.time % 100:
                 print("Starting Generation: " + str(self.time))
             if self.learning_method == 'GA':
                 self.genetic_algorithm_setup()
-            if self.learning_method == 'RL':
-                self.reinforcement_learning_setup()
             for agent_index in range(self.number_of_agents):
                 for agent_jdex in range(agent_index + 1, self.number_of_agents):
                     one_shot_game = Game(self.agents[agent_index], self.agents[agent_jdex], self.timeout, self.game_type)
                     one_shot_game.play()
                     if self.learning_method == 'RL':
                         self.agents[agent_index].final_payoff(one_shot_game.row_agent_payoff)
+                        self.agents[agent_index].update_type()
                         self.agents[agent_jdex].final_payoff(one_shot_game.column_agent_payoff)
+                        self.agents[agent_jdex].update_type()
+
                     self.game_history[self.time].append(copy.deepcopy(one_shot_game))
 
             self.time = self.time + 1
