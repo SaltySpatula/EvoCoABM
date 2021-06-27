@@ -56,6 +56,7 @@ class Model:
                 if mutation_coefficient >= 0.5:
                     # mutate
                     self.mutate(better_agent)
+                    better_agent.update_type()
 
                 new_population[new_population_index] = better_agent
                 new_population_index = new_population_index + 1
@@ -63,12 +64,9 @@ class Model:
             self.agents = new_population
 
     def run_model(self):
-        print("Running model...")
         if self.learning_method == 'RL':
             self.reinforcement_learning_setup()
         while self.time != self.generations:
-            if not self.time % 100:
-                print("Starting Generation: " + str(self.time))
             if self.learning_method == 'GA':
                 self.genetic_algorithm_setup()
             for agent_index in range(self.number_of_agents):
@@ -84,7 +82,6 @@ class Model:
                     self.game_history[self.time].append(copy.deepcopy(one_shot_game))
 
             self.time = self.time + 1
-        print("Done")
 
     def create_random_agent(self):
         number_of_states = random.choice([i for i in range(1, self.agent_computation_capacity+1)])
@@ -136,9 +133,9 @@ class Game:
         if type == 'PD':
             self.payoff_matrix = {
                 'CC': [3, 3],
-                'CD': [0, 4],
+                'CD': [0, 5],
                 'DD': [1, 1],
-                'DC': [4, 0],
+                'DC': [5, 0],
                 'COL_UNDECIDED': [2, -5],
                 'ROW_UNDECIDED': [-5, 2],
                 'BOTH_UNDECIDED': [-5, -5]

@@ -85,13 +85,15 @@ class GameHistoryAnalysis:
             cooperative_percentage = generation_cooperative_games/games_in_generation * 100
 
             self.average_payoffs.append(generation_average_payoff / games_in_generation)
-            self.average_regular_game_payoffs.append(generation_regular_average_payoff / regular_games_in_generation)
+            if regular_games_in_generation > 0:
+                self.average_regular_game_payoffs.append(generation_regular_average_payoff / regular_games_in_generation)
             self.tokens_exchanged_by_generation.append(generation_total_tokens_exchanged)
             self.tokens_exchanged_by_generation_regular.append(generation_regular_total_tokens_exchanged)
             self.cooperative_play_percentages.append(cooperative_percentage)
             self.average_chat_length.append(generation_total_tokens_exchanged / (2 * games_in_generation))
-            self.average_regular_chat_length.append(
-                generation_regular_total_tokens_exchanged / (2 * regular_games_in_generation))
+            if regular_games_in_generation > 0:
+                self.average_regular_chat_length.append(
+                    generation_regular_total_tokens_exchanged / (2 * regular_games_in_generation))
             self.ncd_agents_by_generation.append(ncd_agents)
             self.crc_agents_by_generation.append(crc_agents)
             self.cd_agents_by_generation.append(cd_agents)
@@ -102,42 +104,56 @@ class GameHistoryAnalysis:
         plt.plot(self.average_payoffs)
         plt.ylabel('Average Payoff')
         plt.xlabel('Generation')
+        plt.title('Average Game Payoff')
+        plt.show()
+
+    def plot_average_regular_game_payoff(self):
+        plt.plot(self.average_regular_game_payoffs)
+        plt.ylabel('Average Payoff')
+        plt.xlabel('Generation')
+        plt.title('Average Regular Game Payoff')
         plt.show()
 
     def plot_total_communication(self):
         plt.plot(self.tokens_exchanged_by_generation)
         plt.ylabel('Tokens Exchanged')
         plt.xlabel('Generation')
+        plt.title('Total Tokens exchanged by Generation')
         plt.show()
 
     def plot_total_regular_communication(self):
         plt.plot(self.tokens_exchanged_by_generation_regular)
         plt.ylabel('Tokens Exchanged in regular games')
         plt.xlabel('Generation')
+        plt.title('Total Tokens exchanged by Generation in regular games')
         plt.show()
 
     def plot_cooperation_percentage(self):
         plt.plot(self.cooperative_play_percentages)
-        plt.ylabel('Proportion [%] of Games with Mutual Cooperation')
+        plt.ylabel('[%] of Games')
         plt.xlabel('Generation')
+        plt.title('Proportion [%] of Games with Mutual Cooperation')
         plt.show()
 
     def plot_average_chat_length(self):
         plt.plot(self.average_chat_length)
         plt.ylabel('Average Chat Length')
         plt.xlabel('Generation')
+        plt.title('Average Chat Length by Generation')
         plt.show()
 
     def plot_average_regular_chat_length(self):
         plt.plot(self.average_regular_chat_length)
         plt.ylabel('Average Chat Length in regular games')
         plt.xlabel('Generation')
+        plt.title('Average Chat Length by Generation in regular Games')
         plt.show()
 
     def plot_number_of_unique_conversations(self):
         plt.plot(self.regular_unique_conversations_by_gen)
         plt.ylabel('Unique Conversations')
         plt.xlabel('Generation')
+        plt.title('Unique Conversations by Generation in regular Games')
         plt.show()
 
     def plot_NCD_agents(self):
